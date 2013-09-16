@@ -1,4 +1,6 @@
+#!/usr/bin/python
 
+import time
 
 class BitVector:
     """A bit vector (or bitmap or bit array) that allows for the efficient storage of data.
@@ -26,26 +28,67 @@ class BitVector:
 
     """
 
+    # maximum index we're allowing. it starts getting slow after this
+    MAX_INT = 9999999999
+
+    # the internal integer that represents our bitmap
     vector = 0
 
+    # a dictionary of powers of 2 to their bit-shifted representation. good kickstart to bitshifting.
+    # speed_table = {}
+
+    # a temporary variable to store our current mask
+    # temp_mask = 0
+
+    # def __init__(self, speed_table_max_key=8):
+    #     if speed_table_max_key > 0:
+    #         speed_table = {2**k:(1 << (2**k)) for k in range(3, speed_table_max_key)}
+
     def set(self, i):
-        mask = 1 << i
+        self.validate(i)
+        mask = self.mask(i)
         self.vector = self.vector | mask
 
     def unset(self, i):
-        if (self.get(i)):
-            mask = 1 << i
+        self.validate(i)
+        if self.get(i):
+            mask = self.mask(i)
             self.vector = self.vector ^ mask
         # should I implement this using twos-complement negative numbers and an &?
 
     def get(self, i):
-        mask = 1 << i
+        self.validate(i)
+        mask = self.mask(i)
         masked = self.vector & mask
         return (bool) (masked >> i)
 
+    def mask(self, i):
+        self.validate(i)
+
+        # base = 1
+        # if len(self.speed_table) > 0:
+        #     (i, base) = self._speed_table_lookup(i)
+        mask = 1 << i
+        # self.temp_mask = 1 << i
+        return mask
+
+    # def _speed_table_lookup(self, i):
+    #     key = 0
+    #     value = 1
+    #     for k, v in self.speed_table.iteritems():
+    #         if i <= k:
+    #             key = k
+    #             value = v
+    #         else:
+    #             break
+    #     return (i - key, value)
+
     def validate(self, i):
-        if (i < 0):
-            raise Exception
+        if i < 0:
+            raise IndexError("Index must be positive");
+
+        if i > self.MAX_INT:
+            raise IndexError("Index cannot exceed system's maxint: " + str(self.MAX_INT))
         # exception for too large int
 
     def __iter__(self):
@@ -73,7 +116,7 @@ if __name__ == "__main__":
     print MyBitVector.get(2524731)
     print MyBitVector.get(2524732)
     print MyBitVector.get(2524733)
-    MyBitVector.set(9999999999999999999999999999999999999999999999999999999999999989)
-    print MyBitVector.get(9999999999999999999999999999999999999999999999999999999999999988)
-    print MyBitVector.get(9999999999999999999999999999999999999999999999999999999999999989)
-    print MyBitVector.get(9999999999999999999999999999999999999999999999999999999999999999)
+    MyBitVector.set(9999999998)
+    print MyBitVector.get(9999999997)
+    print MyBitVector.get(9999999998)
+    print MyBitVector.get(9999999999)
